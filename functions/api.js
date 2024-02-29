@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const serverless = require("serverless-http");
+const router = express.Router();
 
 const app = express();
 
@@ -25,6 +27,10 @@ const userSchema = new mongoose.Schema({
   password: String,
 });
 const User = mongoose.model("User", userSchema);
+
+app.get("/", (req, res) => {
+  res.send("I am working");
+});
 
 // Registration endpoint
 app.post("/register", async (req, res) => {
@@ -75,6 +81,9 @@ function authenticateToken(req, res, next) {
 }
 
 // Start server
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
-});
+// app.listen(3000, () => {
+//   console.log("Server is running on port 3000");
+// });
+
+app.use("/.netlify/functions/api", router);
+module.exports.handler = serverless(app);
