@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const serverless = require("serverless-http");
 const router = express.Router();
 const bodyParser = require("body-parser");
+const morgan = require("morgan");
 
 const app = express();
 
@@ -30,7 +31,7 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 
 app.use(bodyParser.json());
-
+app.use(morgan("dev"));
 app.get("/", (req, res) => {
   res.send("I am working");
 });
