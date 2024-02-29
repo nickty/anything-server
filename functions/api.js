@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const serverless = require("serverless-http");
 const router = express.Router();
+const bodyParser = require("body-parser");
 
 const app = express();
 
@@ -27,6 +28,8 @@ const userSchema = new mongoose.Schema({
   password: String,
 });
 const User = mongoose.model("User", userSchema);
+
+app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
   res.send("I am working");
@@ -81,9 +84,9 @@ function authenticateToken(req, res, next) {
 }
 
 // Start server
-// app.listen(3000, () => {
-//   console.log("Server is running on port 3000");
-// });
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
 
 app.use("/.netlify/functions/api", router);
 module.exports.handler = serverless(app);
