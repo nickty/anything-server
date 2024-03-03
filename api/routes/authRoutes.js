@@ -11,6 +11,7 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
+  // Registration logic...
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = new User({
@@ -25,6 +26,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
+  // Login logic...
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return res.status(400).send("Invalid email or password");
@@ -33,18 +35,11 @@ router.post("/login", async (req, res) => {
   if (!validPassword) {
     return res.status(400).send("Invalid email or password");
   }
-  const accessToken = jwt.sign(
+  const token = jwt.sign(
     { userId: user._id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: "15m" } // Access token expires in 15 minutes
+    process.env.JWT_SECRET
   );
-  const refreshToken = jwt.sign(
-    { userId: user._id, email: user.email },
-    process.env.JWT_REFRESH_SECRET,
-    { expiresIn: "7d" } // Refresh token expires in 7 days
-  );
-  res.cookie("refreshToken", refreshToken, { httpOnly: true }); // Set refresh token as HttpOnly cookie
-  res.send({ accessToken, refreshToken });
+  res.header("auth-token", token).send(token);
 });
 
 module.exports = router;
