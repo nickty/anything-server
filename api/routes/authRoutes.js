@@ -44,9 +44,9 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    // Login logic...
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
+      // Ensure execution stops after sending this response
       return res.status(400).send("Invalid email or password");
     }
     const validPassword = await bcrypt.compare(
@@ -54,28 +54,30 @@ router.post("/login", async (req, res) => {
       user.password
     );
     if (!validPassword) {
+      // Ensure execution stops after sending this response
       return res.status(400).send("Invalid email or password");
     }
 
-    // Generate access token
     const accessToken = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "15m" } // Access token expires in 15 minutes
+      { expiresIn: "15m" }
     );
 
-    // Generate refresh token
     const refreshToken = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_REFRESH_SECRET,
-      { expiresIn: "7d" } // Refresh token expires in 7 days
+      { expiresIn: "7d" }
     );
 
-    // Send both tokens to the client
+    // Correctly send both tokens only once
     res.json({ accessToken, refreshToken });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).send("Internal server error");
+    // Check if headers have been sent
+    if (!res.headersSent) {
+      res.status(500).send("Internal server error");
+    }
   }
 });
 
