@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const connectDB = require('./config/db')
 const authRoutes = require('./routes/authRoutes')
+const messagesRoutes = require('./routes/messageRoutes')
 const authenticateToken = require('./middlewares/authenticateToken')
 require('dotenv').config()
 
@@ -12,6 +13,8 @@ connectDB()
 app.use(bodyParser.json())
 app.use(morgan('dev'))
 app.use('/', authRoutes)
+
+app.use('/messages', messagesRoutes)
 
 app.get('/profile', authenticateToken, (req, res) => {
   res.send(req.user)
